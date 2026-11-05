@@ -1,8 +1,39 @@
-# React + TypeScript + Vite
+# NÓW Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A modern marketplace application** inspired by Vinted, built with React + TypeScript + Firebase.
 
-Currently, two official plugins are available:
+Users can buy and sell items, search with filters, manage favorites, and upload product images. The MVP focuses on core functionality: authentication, listings CRUD, search, and favorites management.
+
+## 📚 Project Documentation
+
+- **[Project Roadmap](docs/roadmap.md)** ← Start here! Overview, sprint timeline, and MVP criteria
+- **[Full Implementation Plan](docs/implementation-plan.md)** – Detailed 6-sprint plan with all tasks and acceptance criteria
+- **[CLAUDE.md](CLAUDE.md)** – Project constraints, architecture standards, workflow
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 19.3 + TypeScript 6.0 + Vite 8.3
+- **State:** Redux Toolkit
+- **Styling:** Tailwind CSS
+- **Routing:** React Router v7
+- **Backend:** Firebase (Auth + Firestore + Cloud Storage)
+- **Forms:** React Hook Form + Zod
+- **Testing:** Vitest + React Testing Library + Playwright
+
+## 🚀 Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+See [Project Roadmap](docs/roadmap.md) for detailed setup instructions (coming soon).
+
+---
+
+# Template Info: React + TypeScript + Vite
+
+This project uses Vite with React Compiler enabled. For more information:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
