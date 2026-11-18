@@ -27,6 +27,15 @@ Projekt rozwijany jest etapami, zgodnie z wymaganiami w `docs/requirements.md`. 
 
 **Przed dużymi zmianami:** Przedstaw propozycję i czekaj na akceptację.
 
+### Model danych – ustalenia obowiązujące we wszystkich sprintach
+
+- **Kategorie:** `fashion` (Moda), `electronics` (Elektronika), `home` (Dom), `sports` (Sport), `other` (Inne) – źródło: `CATEGORIES` w `src/utils/constants.ts`
+- **Podkategorie Mody:** `women` (Kobiety), `men` (Mężczyźni), `kids` (Dzieci) – źródło: `FASHION_SUBCATEGORIES`
+  - Ogłoszenie z kategorii `fashion` **musi** mieć podkategorię; pozostałe kategorie jej **nie mają**
+  - Reguła obowiązuje w danych mock, formularzach (Zod), filtrach i Firestore Security Rules
+- **Dane użytkownika:** `PublicUser` (dane widoczne dla innych) jest oddzielony od `User` (dane prywatne, np. e-mail). Dane sprzedającego pokazywane innym użytkownikom przechodzą przez `toPublicUser()`
+- Nie dodawaj kategorii/podkategorii w kodzie bez aktualizacji `docs/requirements.md`
+
 ---
 
 ## 4. UI/UX

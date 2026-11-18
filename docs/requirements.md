@@ -82,12 +82,28 @@ Użytkownik może:
 - Ustawić tytuł ogłoszenia
 - Dodać opis produktu
 - Określić cenę
-- Wybrać kategorię
+- Wybrać kategorię (a dla kategorii Moda – także podkategorię)
 - Określić stan produktu
 - Dodać zdjęcia produktu
 - Edytować własne ogłoszenie
 - Usunąć własne ogłoszenie
 - Oznaczyć ogłoszenie jako sprzedane
+
+#### Kategorie i podkategorie (ustalone w Sprincie 1, Issue #1)
+
+| Kategoria | Identyfikator | Podkategorie |
+|-----------|---------------|--------------|
+| Moda | `fashion` | Kobiety (`women`), Mężczyźni (`men`), Dzieci (`kids`) |
+| Elektronika | `electronics` | – |
+| Dom | `home` | – |
+| Sport | `sports` | – |
+| Inne | `other` | – |
+
+Zasady:
+
+- Ogłoszenie z kategorii Moda musi mieć jedną podkategorię.
+- Ogłoszenia z pozostałych kategorii nie mają podkategorii.
+- Lista kategorii i podkategorii jest jedynym źródłem prawdy dla danych mock, formularzy, filtrów i reguł bazy danych. Zmiana listy wymaga aktualizacji tego dokumentu.
 
 ### 4.4 Strona główna
 
@@ -101,6 +117,7 @@ Użytkownik może:
 
 - Wyszukiwanie po nazwie produktu
 - Filtrowanie według kategorii
+- Filtrowanie według podkategorii Mody (Kobiety, Mężczyźni, Dzieci)
 - Filtrowanie według przedziału cenowego
 - Filtrowanie według stanu produktu
 - Sortowanie produktów według ceny i daty dodania
@@ -110,8 +127,8 @@ Użytkownik może:
 - Galeria zdjęć
 - Nazwa i opis produktu
 - Cena
-- Stan i kategoria
-- Informacje o sprzedającym
+- Stan i kategoria (z podkategorią dla Mody)
+- Informacje o sprzedającym (wyłącznie dane publiczne – bez e-maila)
 - Przycisk dodania do ulubionych
 
 ### 4.7 Ulubione
