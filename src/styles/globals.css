@@ -1,6 +1,82 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens (@theme: colors, typography, spacing, radius, shadows) are added
- * in Sprint 1.2 (#2) based on the NÓW Marketplace Figma Make project.
+ * NÓW Marketplace design tokens, taken from the Figma Make project.
+ * Text colors that failed WCAG AA on light surfaces were mapped to `muted`.
  */
+@theme {
+  /* Fonts (loaded in index.html) */
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'DM Serif Display', ui-serif, Georgia, serif;
+
+  /* Brand */
+  --color-ink: #18251d;
+  --color-forest: #1f4b35;
+  --color-forest-dark: #153a28;
+  --color-moss: #5d755f;
+  --color-leaf: #7c9b78; /* decorative only – 3:1 on white */
+
+  /* Surfaces */
+  --color-cream: #f8f7f2;
+  --color-mint: #eff4ec;
+  --color-sage: #dfe8d9;
+  --color-surface: #eeeee9; /* image placeholders */
+  --color-skeleton: #eceee9;
+  --color-skeleton-highlight: #f7f8f5;
+
+  /* Lines & muted text */
+  --color-line: #dfe2da;
+  --color-field: #d8ddd6;
+  --color-muted: #667169;
+
+  /* Feedback */
+  --color-danger: #a44235;
+  --color-favorite: #b3564e;
+  --color-focus: #5f8068;
+
+  /* Elevation */
+  --shadow-soft: 0 2px 12px rgb(20 33 24 / 8%);
+  --shadow-overlay: 0 10px 30px rgb(15 32 21 / 20%);
+
+  /* Motion */
+  --animate-shimmer: shimmer 1.25s linear infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@layer base {
+  body {
+    min-width: 320px;
+    background-color: #fff;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
