@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /*
  * NÓW Marketplace design tokens, taken from the Figma Make project.
@@ -6,8 +6,8 @@
  */
 @theme {
   /* Fonts (loaded in index.html) */
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'DM Serif Display', ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Serif Display", ui-serif, Georgia, serif;
 
   /* Brand */
   --color-ink: #18251d;
@@ -17,6 +17,8 @@
   --color-leaf: #7c9b78; /* decorative only – 3:1 on white */
 
   /* Surfaces */
+  --color-pine: #122a1d; /* footer background */
+  --color-mist: #aab9ae; /* muted text on pine – 7.5:1 */
   --color-cream: #f8f7f2;
   --color-mint: #eff4ec;
   --color-sage: #dfe8d9;

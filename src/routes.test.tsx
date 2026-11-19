@@ -25,6 +25,20 @@ describe('routes', () => {
     ).toBeInTheDocument()
   })
 
+  it('wraps pages in header, main and footer landmarks with a skip link first', () => {
+    renderAt('/')
+
+    const skipLink = screen.getByRole('link', { name: 'Przejdź do treści' })
+    expect(skipLink).toHaveAttribute('href', '#main-content')
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content')
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+
+    // The skip link must be the first focusable element on the page.
+    const firstLink = document.querySelector('a, button')
+    expect(firstLink).toBe(skipLink)
+  })
+
   it('renders NotFound for unknown paths with a link back home', () => {
     renderAt('/this/does/not/exist')
 
