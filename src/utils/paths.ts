@@ -27,3 +27,25 @@ export type CategoryFilter =
 export function marketplacePath(filter: CategoryFilter): string {
   return `${PATHS.marketplace}?${new URLSearchParams(filter)}`
 }
+
+/** Query keys that define *which* listings a nav link shows (unlike sorting or paging). */
+const NAV_FILTER_KEYS = ['category', 'subcategory'] as const
+
+/**
+ * Whether a nav target (e.g. `/marketplace?category=home`) matches the current
+ * location: same path and same category filters. Other params (sort, search
+ * query) are ignored, so "Wszystkie produkty" (`/marketplace`) is active only
+ * when no category filter is applied.
+ */
+export function isNavTargetActive(
+  to: string,
+  location: { pathname: string; search: string },
+): boolean {
+  const target = new URL(to, 'http://local')
+  if (target.pathname !== location.pathname) return false
+
+  const current = new URLSearchParams(location.search)
+  return NAV_FILTER_KEYS.every(
+    (key) => target.searchParams.get(key) === current.get(key),
+  )
+}

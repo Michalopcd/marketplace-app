@@ -9,6 +9,28 @@ describe('buttonClassName', () => {
     expect(result).toContain('min-h-12')
   })
 
+  it('gives filled and outlined buttons the same 8px radius and a smooth hover', () => {
+    for (const variant of ['primary', 'secondary'] as const) {
+      const classes = buttonClassName({ variant }).split(' ')
+
+      expect(classes).toContain('rounded-lg')
+      expect(classes).toContain('transition')
+    }
+
+    const primary = buttonClassName().split(' ')
+    expect(primary).toContain('hover:bg-forest-dark')
+    expect(primary).toContain('hover:not-disabled:-translate-y-px')
+  })
+
+  it('keeps the same shape for small and full-width primary buttons', () => {
+    const shape = (classes: string) =>
+      classes.split(' ').filter((c) => c.startsWith('rounded') || c.startsWith('bg-'))
+
+    expect(shape(buttonClassName({ size: 'sm' }))).toEqual(
+      shape(buttonClassName({ fullWidth: true })),
+    )
+  })
+
   it('supports secondary variant', () => {
     const result = buttonClassName({ variant: 'secondary' })
 

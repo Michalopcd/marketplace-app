@@ -35,20 +35,57 @@ describe("SiteHeader", () => {
     expectSingleLink("NÓW Marketplace - strona główna", "/");
   });
 
-  it("renders primary links and marks the active route with aria-current", () => {
-    renderHeader("/marketplace");
+  it("has no separate home/marketplace links on desktop – the logo leads home", () => {
+    renderHeader();
 
-    const nav = screen.getByRole("navigation", {
-      name: "Główna nawigacja",
-    });
+    const banner = screen.getByRole("banner");
 
     expect(
-      within(nav).getByRole("link", { name: "Marketplace" }),
-    ).toHaveAttribute("aria-current", "page");
-
+      screen.queryByRole("navigation", { name: "Główna nawigacja" }),
+    ).not.toBeInTheDocument();
     expect(
-      within(nav).getByRole("link", { name: "Strona główna" }),
-    ).not.toHaveAttribute("aria-current");
+      within(banner).queryByRole("link", { name: "Strona główna" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(banner).queryByRole("link", { name: "Marketplace" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('starts the category row with "Wszystkie produkty"', () => {
+    renderHeader();
+
+    const nav = screen.getByRole("navigation", { name: "Kategorie" });
+    const links = within(nav).getAllByRole("link");
+
+    expect(links[0]).toHaveAccessibleName("Wszystkie produkty");
+    expect(links[0]).toHaveAttribute("href", "/marketplace");
+  });
+
+  it.each([
+    ["/marketplace", "Wszystkie produkty"],
+    ["/marketplace?sortBy=price-asc", "Wszystkie produkty"],
+    ["/marketplace?category=fashion&subcategory=women", "Kobiety"],
+    ["/marketplace?category=home", "Dom"],
+  ])("at %s marks only %s as the current page", (path, activeLabel) => {
+    renderHeader(path);
+
+    const nav = screen.getByRole("navigation", { name: "Kategorie" });
+    const current = within(nav)
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page");
+
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveAccessibleName(activeLabel);
+  });
+
+  it("marks no category as current outside the marketplace", () => {
+    renderHeader("/favorites");
+
+    const nav = screen.getByRole("navigation", { name: "Kategorie" });
+
+    for (const link of within(nav).getAllByRole("link")) {
+      expect(link).not.toHaveAttribute("aria-current");
+    }
   });
 
   it("links categories to a pre-filtered marketplace, splitting fashion by audience", () => {
@@ -115,6 +152,22 @@ describe("SiteHeader", () => {
       ).toHaveAttribute("href", "/favorites");
     });
 
+    it('keeps "Strona główna" and replaces "Marketplace" with "Wszystkie produkty"', () => {
+      renderHeader("/marketplace");
+
+      const dialog = openMenu();
+
+      expect(
+        within(dialog).getByRole("link", { name: "Strona główna" }),
+      ).toHaveAttribute("href", "/");
+      expect(
+        within(dialog).getByRole("link", { name: "Wszystkie produkty" }),
+      ).toHaveAttribute("aria-current", "page");
+      expect(
+        within(dialog).queryByRole("link", { name: "Marketplace" }),
+      ).not.toBeInTheDocument();
+    });
+
     it("closes with the close button", () => {
       renderHeader();
 
@@ -130,7 +183,7 @@ describe("SiteHeader", () => {
       expect(getTrigger()).toHaveAttribute("aria-expanded", "false");
     });
 
-    it.each(["Marketplace", "NÓW Marketplace - strona główna", "Sprzedaj"])(
+    it.each(["Wszystkie produkty", "NÓW Marketplace - strona główna", "Sprzedaj"])(
       'closes after choosing the "%s" link',
       (name) => {
         renderHeader();

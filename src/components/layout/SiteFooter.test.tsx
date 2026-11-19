@@ -17,11 +17,12 @@ describe("SiteFooter", () => {
     renderFooter();
 
     const footer = screen.getByRole("contentinfo");
-    expect(
-      within(footer).getByRole("link", {
-        name: "NÓW Marketplace - strona główna",
-      }),
-    ).toHaveClass("text-white");
+    const logo = within(footer).getByRole("link", {
+      name: "NÓW Marketplace - strona główna",
+    });
+
+    expect(logo).toHaveAttribute("href", "/");
+    expect(logo).toHaveClass("text-white");
   });
 
   it("groups links in labelled navigation regions with headings", () => {
@@ -32,8 +33,11 @@ describe("SiteFooter", () => {
       within(shop).getByRole("heading", { level: 2, name: "Kupuj" }),
     ).toBeInTheDocument();
     expect(
-      within(shop).getByRole("link", { name: "Marketplace" }),
+      within(shop).getByRole("link", { name: "Wszystkie produkty" }),
     ).toHaveAttribute("href", "/marketplace");
+    expect(
+      within(shop).queryByRole("link", { name: "Marketplace" }),
+    ).not.toBeInTheDocument();
     expect(within(shop).getByRole("link", { name: "Dzieci" })).toHaveAttribute(
       "href",
       "/marketplace?category=fashion&subcategory=kids",

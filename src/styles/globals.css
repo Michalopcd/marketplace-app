@@ -8,6 +8,7 @@
   /* Fonts (loaded in index.html) */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "DM Serif Display", ui-serif, Georgia, serif;
+  --font-logo: "Bodoni Moda", ui-serif, Georgia, serif; /* NÓW wordmark, 700 only */
 
   /* Brand */
   --color-ink: #18251d;

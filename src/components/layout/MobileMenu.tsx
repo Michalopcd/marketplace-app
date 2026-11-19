@@ -1,24 +1,20 @@
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
-import { Link } from "react-router";
+import { cn } from "../../utils/cn";
 import { CloseIcon, MenuIcon, PlusIcon } from "../icons/icons";
 import { ButtonLink } from "../ui/ButtonLink";
 import { Logo } from "./Logo";
+import { NavItemLink } from "./NavItemLink";
 import {
-  CATEGORY_LINKS,
   FAVORITES_LINK,
+  HOME_LINK,
   LOGIN_LINK,
-  PRIMARY_LINKS,
   SELL_LINK,
+  SHOP_LINKS,
 } from "./navigationLinks";
 
 const DESKTOP_QUERY = "(min-width: 48rem)";
 
-const DRAWER_LINKS = [
-  ...PRIMARY_LINKS,
-  ...CATEGORY_LINKS,
-  FAVORITES_LINK,
-  LOGIN_LINK,
-];
+const DRAWER_LINKS = [HOME_LINK, ...SHOP_LINKS, FAVORITES_LINK, LOGIN_LINK];
 
 const iconButtonClassName =
   "group grid size-11 place-items-center rounded-lg text-ink transition-all duration-200 hover:bg-mint hover:text-forest active:bg-mint active:scale-90 motion-reduce:transition-none";
@@ -45,7 +41,7 @@ export function MobileMenu() {
 
     const closeOnDesktop = (event: MediaQueryListEvent) => {
       if (event.matches) {
-        dialogRef.current?.close();
+        close();
       }
     };
 
@@ -115,14 +111,19 @@ export function MobileMenu() {
           {/* Navigation links */}
           <nav aria-label="Menu mobilne" className="pt-5">
             <ul className="space-y-1">
-              {DRAWER_LINKS.map(({ label, to }) => (
-                <li key={to}>
-                  <Link
-                    to={to}
-                    className="flex min-h-12 items-center border-b border-forest/30 px-3 py-3 text-base font-medium text-ink transition-colors duration-200 hover:border-forest hover:bg-mint hover:text-forest"
-                  >
-                    {label}
-                  </Link>
+              {DRAWER_LINKS.map((item) => (
+                <li key={item.to}>
+                  <NavItemLink
+                    item={item}
+                    className={(isActive) =>
+                      cn(
+                        "flex min-h-12 items-center border-b px-3 py-3 text-base font-medium transition-colors duration-200",
+                        isActive
+                          ? "border-forest bg-mint text-forest"
+                          : "border-forest/30 text-ink hover:border-forest hover:bg-mint hover:text-forest",
+                      )
+                    }
+                  />
                 </li>
               ))}
             </ul>
