@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { render, screen, within } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { createMemoryRouter, RouterProvider } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { createMemoryRouter, data, RouterProvider } from 'react-router'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { setupStore } from './redux/store'
 import { routes } from './routes'
 
@@ -14,6 +14,55 @@ function renderAt(path: string) {
     </Provider>,
   )
 }
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+/** The real root route (layout + RouteError) with one child that fails as given. */
+function renderFailingRoute(fail: () => never) {
+  const [{ path, element, errorElement }] = routes
+  const router = createMemoryRouter(
+    [{ path, element, errorElement, children: [{ path: 'broken', loader: fail }] }],
+    { initialEntries: ['/broken'] },
+  )
+  render(
+    <Provider store={setupStore()}>
+      <RouterProvider router={router} />
+    </Provider>,
+  )
+}
+
+describe('RouteError', () => {
+  it('shows the HTTP status for error responses', async () => {
+    renderFailingRoute(() => {
+      throw data('Missing', { status: 404 })
+    })
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Coś poszło nie tak' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Błąd 404')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Wróć na stronę główną' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+  })
+
+  it('shows a generic message without a status for unexpected errors', async () => {
+    // React Router logs caught errors to the console; keep the test output clean.
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderFailingRoute(() => {
+      throw new Error('boom')
+    })
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Coś poszło nie tak' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/^Błąd \d+/)).not.toBeInTheDocument()
+    expect(screen.getByRole('main')).toBeInTheDocument()
+  })
+})
 
 describe('routes', () => {
   it('renders the HOME page inside the main landmark', () => {

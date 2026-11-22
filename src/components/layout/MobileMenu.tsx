@@ -73,7 +73,7 @@ export function MobileMenu() {
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={menuId}
-        className={`${iconButtonClassName} -ml-2.5 md:hidden`}
+        className={`${iconButtonClassName} -ml-[10px] md:hidden`}
       >
         <MenuIcon
           size={24}

@@ -29,8 +29,12 @@ export function CategoryShowcase({ categories, showCounts }: Props) {
           action={{ label: CATEGORIES_SECTION.action, to: PATHS.marketplace }}
         />
 
-        {/* Bleeds to the right screen edge while scrolling, like the Figma mobile layout. */}
-        <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1.5 [scrollbar-width:none] max-md:-mr-4 max-md:pr-4 md:max-lg:-mr-8 md:max-lg:pr-8 lg:grid lg:grid-cols-7 lg:gap-[17px] lg:overflow-visible [&::-webkit-scrollbar]:hidden">
+        {/*
+          Bleeds to the right screen edge while scrolling, like the Figma mobile layout.
+          The bleed is in px to match Container's px gutters (16/32 px); a rem value would
+          outgrow the gutter when users enlarge the browser text size.
+        */}
+        <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1.5 [scrollbar-width:none] max-md:-mr-[16px] max-md:pr-[16px] md:max-lg:-mr-[32px] md:max-lg:pr-[32px] lg:grid lg:grid-cols-7 lg:gap-[17px] lg:overflow-visible [&::-webkit-scrollbar]:hidden">
           {categories.map(({ key, label, filter, count, image }) => (
             <li key={key} className="w-[158px] flex-none snap-start lg:w-auto">
               {/*

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "./SiteHeader";
 
 function renderHeader(path = "/") {
@@ -183,19 +183,20 @@ describe("SiteHeader", () => {
       expect(getTrigger()).toHaveAttribute("aria-expanded", "false");
     });
 
-    it.each(["Wszystkie produkty", "NÓW Marketplace - strona główna", "Sprzedaj"])(
-      'closes after choosing the "%s" link',
-      (name) => {
-        renderHeader();
+    it.each([
+      "Wszystkie produkty",
+      "NÓW Marketplace - strona główna",
+      "Sprzedaj",
+    ])('closes after choosing the "%s" link', (name) => {
+      renderHeader();
 
-        const dialog = openMenu();
+      const dialog = openMenu();
 
-        fireEvent.click(within(dialog).getByRole("link", { name }));
+      fireEvent.click(within(dialog).getByRole("link", { name }));
 
-        expect(dialog).not.toHaveAttribute("open");
-        expect(getTrigger()).toHaveAttribute("aria-expanded", "false");
-      },
-    );
+      expect(dialog).not.toHaveAttribute("open");
+      expect(getTrigger()).toHaveAttribute("aria-expanded", "false");
+    });
 
     it("syncs state when the dialog closes", () => {
       renderHeader();
@@ -226,6 +227,58 @@ describe("SiteHeader", () => {
       fireEvent.click(dialog);
 
       expect(dialog).not.toHaveAttribute("open");
+    });
+
+    describe("when the viewport changes", () => {
+      /** Tailwind's `md` breakpoint, where the full header navigation appears. */
+      const DESKTOP_QUERY = "(min-width: 48rem)";
+
+      /** A MediaQueryList whose `change` event the test fires by hand. */
+      function controllableMediaQuery() {
+        const list = Object.assign(new EventTarget(), {
+          matches: false,
+          media: DESKTOP_QUERY,
+          onchange: null,
+          addListener: () => {},
+          removeListener: () => {},
+        }) as MediaQueryList;
+        const emit = (matches: boolean) =>
+          act(() => {
+            Object.assign(list, { matches });
+            list.dispatchEvent(Object.assign(new Event("change"), { matches }));
+          });
+        vi.spyOn(window, "matchMedia").mockReturnValue(list);
+        return emit;
+      }
+
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
+      it("closes the menu when the viewport widens to the desktop layout", () => {
+        const emit = controllableMediaQuery();
+        renderHeader();
+        const dialog = openMenu();
+
+        expect(window.matchMedia).toHaveBeenCalledWith(DESKTOP_QUERY);
+
+        emit(true);
+
+        // A hidden modal would leave the page inert – it must close itself.
+        expect(dialog).not.toHaveAttribute("open");
+        expect(getTrigger()).toHaveAttribute("aria-expanded", "false");
+      });
+
+      it("stays open while the viewport remains mobile", () => {
+        const emit = controllableMediaQuery();
+        renderHeader();
+        const dialog = openMenu();
+
+        emit(false);
+
+        expect(dialog).toHaveAttribute("open");
+        expect(getTrigger()).toHaveAttribute("aria-expanded", "true");
+      });
     });
   });
 });

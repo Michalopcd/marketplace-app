@@ -40,13 +40,14 @@ function ActionLink({ item, icon, className }:Props) {
 export function SiteHeader() {
   return (
     <header>
-      <Container className="relative flex h-[61px] items-center justify-between md:h-20 md:justify-start md:gap-10">
+      {/* min-h (not h) and px edge offsets keep the bar intact when users enlarge text. */}
+      <Container className="relative flex min-h-[61px] items-center justify-between md:min-h-20 md:justify-start md:gap-10">
         <MobileMenu />
 
         {/* The logo is the way home on every screen size. */}
         <Logo className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0" />
 
-        <div className="-mr-2.5 flex items-center gap-1 md:mr-0 md:ml-auto md:gap-6">
+        <div className="-mr-[10px] flex items-center gap-1 md:mr-0 md:ml-auto md:gap-6">
           <ActionLink
             item={FAVORITES_LINK}
             icon={<HeartIcon />}
@@ -64,20 +65,26 @@ export function SiteHeader() {
 
       <nav
         aria-label="Kategorie"
-        className="hidden overflow-x-auto border-y border-line md:block"
+        className="hidden border-y border-line md:block"
       >
         <Container>
-          <ul className="flex h-[42px] w-max items-center gap-6 lg:gap-8">
+          {/*
+            No scroll container (it clipped focus outlines). The row fits on one line at
+            every `md+` width; with enlarged text or zoom it wraps instead of overflowing.
+          */}
+          <ul className="flex min-h-11 flex-wrap items-center gap-x-6 lg:gap-x-8">
             {SHOP_LINKS.map((item) => (
               <li key={item.to}>
                 <NavItemLink
                   item={item}
+                  // -mx/px widen the hit area of short labels ("Dom", "Inne") to ≥ 44 px
+                  // without moving them; the underline stays exactly under the text.
                   className={(isActive) =>
                     cn(
-                      "inline-flex min-h-[42px] items-center border-b-2 text-xs font-semibold transition-colors duration-200",
+                      "relative -mx-2.5 inline-flex min-h-11 items-center px-2.5 text-xs font-semibold transition-colors duration-200 after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:transition-colors after:duration-200",
                       isActive
-                        ? "border-forest text-forest"
-                        : "border-transparent hover:border-forest hover:text-forest",
+                        ? "text-forest after:bg-forest"
+                        : "hover:text-forest hover:after:bg-forest",
                     )
                   }
                 />
