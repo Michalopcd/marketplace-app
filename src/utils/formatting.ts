@@ -31,6 +31,26 @@ export function formatPrice(amount: number): string {
   return formatter.format(amount)
 }
 
+const pluralRules = new Intl.PluralRules(LOCALE)
+
+const OFFER_FORMS: Record<Intl.LDMLPluralRule, string> = {
+  zero: 'ofert',
+  one: 'oferta',
+  two: 'oferty',
+  few: 'oferty',
+  many: 'ofert',
+  other: 'oferty',
+}
+
+/** Polish count of offers: "1 oferta", "3 oferty", "5 ofert", "22 oferty". */
+export function formatOfferCount(count: number): string {
+  if (!Number.isInteger(count) || count < 0) {
+    throw new RangeError('Invalid offer count')
+  }
+
+  return `${count} ${OFFER_FORMS[pluralRules.select(count)]}`
+}
+
 /** Formats an ISO 8601 date, e.g. "2026-11-02T10:00:00.000Z" → "2 listopada 2026". */
 export function formatDate(isoDate: string): string {
   const date = new Date(isoDate)

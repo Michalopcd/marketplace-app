@@ -1,31 +1,27 @@
 import type { Listing } from '../types/listing'
 
 /**
- * Placeholder photos (deterministic per seed) until real uploads land in Sprint 4.
- * 4:5 portrait ratio, matching typical product photography.
+ * Local product photo for a sample listing: `public/images/listings/<id>.webp`,
+ * 640×800 (4:5). Each file shows that exact product; sources and the Unsplash
+ * licence are listed in `docs/image-credits.md`. Real uploads arrive in Sprint 4.
  */
-function placeholderImages(listingId: string, count: number): string[] {
-  return Array.from(
-    { length: count },
-    (_, index) => `https://picsum.photos/seed/now-${listingId}-${index}/800/1000`,
-  )
+export function listingImagePath(listingId: string): string {
+  return `/images/listings/${listingId}.webp`
 }
 
 type ListingSeed = Omit<Listing, 'images' | 'isSold' | 'updatedAt'> & {
-  imageCount?: number
   isSold?: boolean
   updatedAt?: string
 }
 
 function createListing({
-  imageCount = 3,
   isSold = false,
   updatedAt,
   ...seed
 }: ListingSeed): Listing {
   return {
     ...seed,
-    images: placeholderImages(seed.id, imageCount),
+    images: [listingImagePath(seed.id)],
     isSold,
     updatedAt: updatedAt ?? seed.createdAt,
   }
@@ -133,7 +129,7 @@ export const mockListings: readonly Listing[] = [
     id: 'listing-9',
     userId: 'user-3',
     title: 'Koszula lniana',
-    description: 'Przewiewna koszula z lnu, kolor szałwiowy. Nowa z metką.',
+    description: 'Przewiewna biała koszula z lnu. Nowa z metką.',
     price: 75,
     category: 'fashion',
     subcategory: 'men',
@@ -311,7 +307,7 @@ export const mockListings: readonly Listing[] = [
   createListing({
     id: 'listing-26',
     userId: 'user-1',
-    title: 'Kalosze dziecięce w kropki',
+    title: 'Żółte kalosze dziecięce',
     description: 'Lekkie kalosze z gumy naturalnej, antypoślizgowa podeszwa.',
     price: 45,
     category: 'fashion',

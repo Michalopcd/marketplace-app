@@ -12,14 +12,16 @@ export interface ButtonStyleOptions {
   className?: string
 }
 
+// `transition` covers colors, shadow and translate, so hover changes animate smoothly.
 const base =
-  'inline-flex items-center justify-center gap-3 font-bold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60'
+  'inline-flex items-center justify-center gap-3 font-bold transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-60'
 
 const variants: Record<ButtonVariant, string> = {
+  // Figma "sell" button: darker green and a 1px lift on hover (not when disabled).
   primary:
-    'rounded-xs border border-forest bg-forest text-white hover:bg-forest-dark hover:border-forest-dark',
+    'rounded-lg border border-forest bg-forest text-white hover:border-forest-dark hover:bg-forest-dark hover:shadow-soft hover:not-disabled:-translate-y-px active:translate-y-0',
   secondary:
-    'rounded-xs border border-forest bg-transparent text-forest hover:bg-mint',
+    'rounded-lg border border-forest bg-transparent text-forest hover:bg-mint',
   text: 'border-b border-field pb-1 text-forest hover:border-forest',
 }
 

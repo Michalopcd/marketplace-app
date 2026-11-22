@@ -4,7 +4,8 @@ import {
   CONDITIONS,
   FASHION_SUBCATEGORIES,
 } from '../utils/constants'
-import { mockListings } from './mockListings'
+import { isShippedImage } from '../test/publicImages'
+import { listingImagePath, mockListings } from './mockListings'
 import { mockUsers } from './mockUsers'
 
 const isIsoDate = (value: string) =>
@@ -79,17 +80,21 @@ describe('mockListings', () => {
     expect([...used].sort()).toEqual([...FASHION_SUBCATEGORIES].sort())
   })
 
-  it('uses valid, unique placeholder image URLs', () => {
+  it('uses one unique local photo per listing, named after the listing', () => {
     const allImages = mockListings.flatMap((listing) => listing.images)
     expect(new Set(allImages).size).toBe(allImages.length)
 
     for (const listing of mockListings) {
-      listing.images.forEach((src, index) => {
-        const url = new URL(src)
-        expect(url.protocol).toBe('https:')
-        expect(url.hostname).toBe('picsum.photos')
-        expect(url.pathname).toBe(`/seed/now-${listing.id}-${index}/800/1000`)
-      })
+      expect(listing.images).toEqual([listingImagePath(listing.id)])
+      expect(listing.images[0]).toBe(`/images/listings/${listing.id}.webp`)
+    }
+  })
+
+  it('ships every listing photo in public/ (no broken images)', () => {
+    for (const listing of mockListings) {
+      for (const src of listing.images) {
+        expect(isShippedImage(src), `${listing.id}: ${src}`).toBe(true)
+      }
     }
   })
 

@@ -2,7 +2,7 @@ import type { RouteObject } from 'react-router'
 import { RootLayout } from './components/layout/RootLayout'
 import { NotFound } from './pages/NotFound'
 import { RouteError } from './pages/RouteError'
-import { UnderConstruction } from './pages/UnderConstruction'
+import { Home } from './pages/Home'
 
 /**
  * Route tree shared by the browser router and tests.
@@ -14,7 +14,7 @@ export const routes: RouteObject[] = [
     element: <RootLayout />,
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <UnderConstruction /> },
+      { index: true, element: <Home /> },
       { path: '*', element: <NotFound /> },
     ],
   },

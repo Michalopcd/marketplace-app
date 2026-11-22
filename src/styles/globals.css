@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /*
  * NÓW Marketplace design tokens, taken from the Figma Make project.
@@ -6,8 +6,9 @@
  */
 @theme {
   /* Fonts (loaded in index.html) */
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'DM Serif Display', ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Serif Display", ui-serif, Georgia, serif;
+  --font-logo: "Bodoni Moda", ui-serif, Georgia, serif; /* NÓW wordmark, 700 only */
 
   /* Brand */
   --color-ink: #18251d;
@@ -15,8 +16,12 @@
   --color-forest-dark: #153a28;
   --color-moss: #5d755f;
   --color-leaf: #7c9b78; /* decorative only – 3:1 on white */
+  --color-fern: #477052; /* hero accent text – 5.1:1 on mint */
+  --color-sun: #f6cf63; /* hero badge background */
 
   /* Surfaces */
+  --color-pine: #122a1d; /* footer background */
+  --color-mist: #aab9ae; /* muted text on pine – 7.5:1 */
   --color-cream: #f8f7f2;
   --color-mint: #eff4ec;
   --color-sage: #dfe8d9;

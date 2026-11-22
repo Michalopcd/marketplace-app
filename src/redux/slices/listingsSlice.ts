@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
 import { getListings } from '../../services/listingsService'
 import type { Listing, ListingId } from '../../types/listing'
+import {
+  CATEGORY_ENTRIES,
+  matchesCategoryFilter,
+  type CategoryEntry,
+} from '../../utils/categories'
 
 export type RequestStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
 
@@ -74,6 +79,29 @@ export const selectListingsError = (state: StateWithListings) =>
 export const selectAvailableListings = createSelector(
   [selectListings],
   (items) => items.filter((listing) => !listing.isSold),
+)
+
+/** Available listings, newest first (ISO dates sort lexicographically). */
+export const selectNewestAvailableListings = createSelector(
+  [selectAvailableListings],
+  (items) => [...items].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+)
+
+export interface CategorySummary extends CategoryEntry {
+  /** Available listings in the category. */
+  count: number
+}
+
+/** Category entries (with their representative cover photos) plus live offer counts. */
+export const selectCategorySummaries = createSelector(
+  [selectAvailableListings],
+  (items): CategorySummary[] =>
+    CATEGORY_ENTRIES.map((entry) => ({
+      ...entry,
+      count: items.filter((listing) =>
+        matchesCategoryFilter(listing, entry.filter),
+      ).length,
+    })),
 )
 
 export const selectListingById = (state: StateWithListings, id: ListingId) =>
