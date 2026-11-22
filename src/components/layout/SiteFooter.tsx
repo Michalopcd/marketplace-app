@@ -25,7 +25,8 @@ export function SiteFooter() {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="inline-flex min-h-11 items-center text-sm text-mist transition-colors duration-200 hover:text-white hover:underline hover:underline-offset-4"
+                    // min-w-11: short labels ("Dom", "Inne") still get a 44×44 px target.
+                    className="inline-flex min-h-11 min-w-11 items-center text-sm text-mist transition-colors duration-200 hover:text-white hover:underline hover:underline-offset-4"
                   >
                     {label}
                   </Link>
