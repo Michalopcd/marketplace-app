@@ -1,9 +1,4 @@
-import {
-  CATEGORIES,
-  CATEGORY_LABELS,
-  FASHION_SUBCATEGORIES,
-  FASHION_SUBCATEGORY_LABELS,
-} from '../../utils/constants'
+import { CATEGORY_ENTRIES } from '../../utils/categories'
 import { marketplacePath, PATHS } from '../../utils/paths'
 
 export interface NavItem {
@@ -25,19 +20,9 @@ const ALL_PRODUCTS_LINK: NavItem = {
   to: PATHS.marketplace,
 }
 
-/** Fashion is split into its subcategories; other categories link directly. */
-const CATEGORY_LINKS: readonly NavItem[] = [
-  ...FASHION_SUBCATEGORIES.map((subcategory) => ({
-    label: FASHION_SUBCATEGORY_LABELS[subcategory],
-    to: marketplacePath({ category: 'fashion', subcategory }),
-  })),
-  ...CATEGORIES.filter((category) => category !== 'fashion').map(
-    (category) => ({
-      label: CATEGORY_LABELS[category],
-      to: marketplacePath({ category }),
-    }),
-  ),
-]
+const CATEGORY_LINKS: readonly NavItem[] = CATEGORY_ENTRIES.map(
+  ({ label, filter }) => ({ label, to: marketplacePath(filter) }),
+)
 
 /** "All products" followed by every category – the shop navigation everywhere. */
 export const SHOP_LINKS: readonly NavItem[] = [

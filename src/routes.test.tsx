@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
@@ -16,12 +16,14 @@ function renderAt(path: string) {
 }
 
 describe('routes', () => {
-  it('renders the index page inside the main landmark', () => {
+  it('renders the HOME page inside the main landmark', () => {
     renderAt('/')
 
-    expect(screen.getByRole('main')).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { level: 1, name: 'NÓW Marketplace' }),
+      within(screen.getByRole('main')).getByRole('heading', {
+        level: 1,
+        name: 'Daj rzeczom drugie życie',
+      }),
     ).toBeInTheDocument()
   })
 

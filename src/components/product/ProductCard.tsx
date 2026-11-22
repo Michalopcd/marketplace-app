@@ -10,7 +10,7 @@ import { formatPrice } from '../../utils/formatting'
 import { HeartIcon } from '../icons/HeartIcon'
 import { Badge } from '../ui/Badge'
 
-interface ProductCardProps {
+interface Props {
   listing: Listing
   /** Favorite toggle is shown only when a handler is given (logic arrives in Sprint 5). */
   isFavorite?: boolean
@@ -30,7 +30,7 @@ export function ProductCard({
   isFavorite = false,
   onToggleFavorite,
   headingLevel: Heading = 'h3',
-}: ProductCardProps) {
+}: Props) {
   const { id, title, images, price, size, condition, isSold } = listing
   const href = `/product/${id}`
 
@@ -42,8 +42,8 @@ export function ProductCard({
             src={images[0]}
             // Decorative: the title right below is the link name; repeating it adds noise.
             alt=""
-            width={800}
-            height={1000}
+            width={640}
+            height={800}
             loading="lazy"
             decoding="async"
             className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"

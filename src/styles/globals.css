@@ -16,6 +16,8 @@
   --color-forest-dark: #153a28;
   --color-moss: #5d755f;
   --color-leaf: #7c9b78; /* decorative only – 3:1 on white */
+  --color-fern: #477052; /* hero accent text – 5.1:1 on mint */
+  --color-sun: #f6cf63; /* hero badge background */
 
   /* Surfaces */
   --color-pine: #122a1d; /* footer background */

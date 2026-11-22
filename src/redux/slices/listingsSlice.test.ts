@@ -8,6 +8,8 @@ import {
   initialListingsState,
   listingsReducer,
   selectAvailableListings,
+  selectCategorySummaries,
+  selectNewestAvailableListings,
   selectListingById,
   selectListings,
   selectListingsError,
@@ -136,5 +138,71 @@ describe('selectors', () => {
 
     expect(selectListingById(state, first.id)).toEqual(first)
     expect(selectListingById(state, 'missing')).toBeNull()
+  })
+})
+
+describe('HOME selectors', () => {
+  const state = setupStore({
+    listings: { ...initialListingsState, items: [...mockListings] },
+  }).getState()
+
+  const available = mockListings.filter((listing) => !listing.isSold)
+
+  it('selectNewestAvailableListings sorts available listings newest first', () => {
+    const newest = selectNewestAvailableListings(state)
+
+    expect(newest).toHaveLength(available.length)
+    expect(newest.every((listing) => !listing.isSold)).toBe(true)
+    for (let i = 1; i < newest.length; i++) {
+      expect(newest[i - 1].createdAt >= newest[i].createdAt).toBe(true)
+    }
+  })
+
+  it('selectNewestAvailableListings does not mutate the store items', () => {
+    const before = state.listings.items.map((listing) => listing.id)
+    selectNewestAvailableListings(state)
+
+    expect(state.listings.items.map((listing) => listing.id)).toEqual(before)
+  })
+
+  it('selectCategorySummaries counts available listings per category entry', () => {
+    const summaries = selectCategorySummaries(state)
+    const byKey = Object.fromEntries(summaries.map((s) => [s.key, s]))
+
+    expect(summaries.map((s) => s.label)).toEqual([
+      'Kobiety',
+      'Mężczyźni',
+      'Dzieci',
+      'Elektronika',
+      'Dom',
+      'Sport',
+      'Inne',
+    ])
+    expect(byKey['fashion-women'].count).toBe(
+      available.filter((l) => l.category === 'fashion' && l.subcategory === 'women')
+        .length,
+    )
+    expect(byKey.home.count).toBe(
+      available.filter((l) => l.category === 'home').length,
+    )
+    expect(summaries.reduce((sum, s) => sum + s.count, 0)).toBe(available.length)
+  })
+
+  it('gives every category its own representative cover, independent of listings', () => {
+    const summaries = selectCategorySummaries(state)
+
+    for (const summary of summaries) {
+      expect(summary.image).toBe(`/images/categories/${summary.key}.webp`)
+    }
+    expect(new Set(summaries.map((s) => s.image)).size).toBe(summaries.length)
+  })
+
+  it('returns zero counts but keeps the covers without listings', () => {
+    const empty = setupStore().getState()
+
+    for (const summary of selectCategorySummaries(empty)) {
+      expect(summary.count).toBe(0)
+      expect(summary.image).toMatch(/^\/images\/categories\/.+\.webp$/)
+    }
   })
 })

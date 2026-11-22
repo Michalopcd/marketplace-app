@@ -19,9 +19,9 @@ interface ProductGridProps {
   onToggleFavorite?: (listingId: Listing['id']) => void
 }
 
-/** Mobile-first: 2 columns on phones, 3 on tablets, 4 on desktop. */
+/** Mobile-first, as in Figma Make: 2 columns on phones and tablets, 4 on desktop. */
 const gridClassName =
-  'grid grid-cols-2 gap-x-2.5 gap-y-7 md:grid-cols-3 md:gap-x-4 md:gap-y-9 lg:grid-cols-4 lg:gap-x-[18px]'
+  'grid grid-cols-2 gap-x-2.5 gap-y-7 md:gap-x-4 md:gap-y-9 lg:grid-cols-4 lg:gap-x-[18px]'
 
 export function ProductGrid(props: ProductGridProps) {
   return (

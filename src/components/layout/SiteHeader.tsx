@@ -27,7 +27,7 @@ function ActionLink({ item, icon, className }:Props) {
     <Link
       to={item.to}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-mint hover:text-forest",
+        "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 px-5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-mint hover:text-forest",
         className,
       )}
     >
