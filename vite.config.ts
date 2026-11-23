@@ -24,6 +24,14 @@ export default defineConfig({
       // Issue #5: the Redux layer must stay above 80% on every metric.
       thresholds: {
         'src/redux/**': { lines: 80, functions: 80, branches: 80, statements: 80 },
+        // Issue #10: search, filter, sort and URL-sync logic must stay above 90%.
+        'src/{utils/listingFilters*,hooks/useListingFilters,hooks/useMarketplaceListings}.ts': {
+          perFile: true,
+          lines: 90,
+          functions: 90,
+          branches: 90,
+          statements: 90,
+        },
       },
     },
   },

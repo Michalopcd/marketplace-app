@@ -41,3 +41,6 @@ export const CONDITION_LABELS = {
 } as const satisfies Record<(typeof CONDITIONS)[number], string>
 
 export const SORT_OPTIONS = ['newest', 'price-asc', 'price-desc'] as const
+
+/** Search phrases longer than a listing title (max 100 chars) can't match anything. */
+export const MAX_SEARCH_QUERY_LENGTH = 100
