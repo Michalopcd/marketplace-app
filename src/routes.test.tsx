@@ -90,6 +90,38 @@ describe('routes', () => {
     expect(firstLink).toBe(skipLink)
   })
 
+  it('renders the MARKETPLACE page and marks "Wszystkie produkty" as current', () => {
+    renderAt('/marketplace')
+
+    expect(
+      within(screen.getByRole('main')).getByRole('heading', {
+        level: 1,
+        name: 'Wszystkie produkty',
+      }),
+    ).toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'Kategorie' })
+    expect(within(nav).getByRole('link', { name: 'Wszystkie produkty' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+  })
+
+  it('opens a category link from the navigation with its heading and current link', () => {
+    renderAt('/marketplace?category=electronics')
+
+    expect(
+      within(screen.getByRole('main')).getByRole('heading', { level: 1, name: 'Elektronika' }),
+    ).toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'Kategorie' })
+    expect(within(nav).getByRole('link', { name: 'Elektronika' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(within(nav).getByRole('link', { name: 'Wszystkie produkty' })).not.toHaveAttribute(
+      'aria-current',
+    )
+  })
+
   it('renders NotFound for unknown paths with a link back home', () => {
     renderAt('/this/does/not/exist')
 
