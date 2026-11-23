@@ -1,25 +1,25 @@
-import type { ReactNode } from "react";
-import { Link } from "react-router";
-import { cn } from "../../utils/cn";
-import { HeartIcon } from "../icons/HeartIcon";
-import { PlusIcon, UserIcon } from "../icons/icons";
-import { ButtonLink } from "../ui/ButtonLink";
-import { Container } from "../ui/Container";
-import { Logo } from "./Logo";
-import { MobileMenu } from "./MobileMenu";
-import { NavItemLink } from "./NavItemLink";
+import type { ReactNode } from 'react'
+import { Link } from 'react-router'
+import { cn } from '../../utils/cn'
+import { HeartIcon } from '../icons/HeartIcon'
+import { PlusIcon, UserIcon } from '../icons/icons'
+import { ButtonLink } from '../ui/ButtonLink'
+import { Container } from '../ui/Container'
+import { Logo } from './Logo'
+import { MobileMenu } from './MobileMenu'
+import { NavItemLink } from './NavItemLink'
 import {
   FAVORITES_LINK,
   LOGIN_LINK,
   SELL_LINK,
   SHOP_LINKS,
   type NavItem,
-} from "./navigationLinks";
+} from './navigationLinks'
 
 interface Props {
-  item: NavItem;
-  icon: ReactNode;
-  className?: string;
+  item: NavItem
+  icon: ReactNode
+  className?: string
 }
 
 function ActionLink({ item, icon, className }:Props) {
@@ -27,19 +27,22 @@ function ActionLink({ item, icon, className }:Props) {
     <Link
       to={item.to}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 px-5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-mint hover:text-forest",
+        'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 px-5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-mint hover:text-forest',
         className,
       )}
     >
       {icon}
       <span className="sr-only lg:not-sr-only">{item.label}</span>
     </Link>
-  );
+  )
 }
 
 export function SiteHeader() {
   return (
-    <header>
+    // Phones: the bar (menu, logo, account) stays visible while scrolling. z-40 sits above
+    // card controls (z-10) and below the skip link (z-50); the drawer is a modal <dialog>
+    // in the top layer, so it is unaffected. Desktop keeps the scrolling header.
+    <header className="sticky top-0 z-40 bg-white md:static">
       {/* min-h (not h) and px edge offsets keep the bar intact when users enlarge text. */}
       <Container className="relative flex min-h-[61px] items-center justify-between md:min-h-20 md:justify-start md:gap-10">
         <MobileMenu />
@@ -81,10 +84,10 @@ export function SiteHeader() {
                   // without moving them; the underline stays exactly under the text.
                   className={(isActive) =>
                     cn(
-                      "relative -mx-2.5 inline-flex min-h-11 items-center px-2.5 text-xs font-semibold transition-colors duration-200 after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:transition-colors after:duration-200",
+                      'relative -mx-2.5 inline-flex min-h-11 items-center px-2.5 text-xs font-semibold transition-colors duration-200 after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:transition-colors after:duration-200',
                       isActive
-                        ? "text-forest after:bg-forest"
-                        : "hover:text-forest hover:after:bg-forest",
+                        ? 'text-forest after:bg-forest'
+                        : 'hover:text-forest hover:after:bg-forest',
                     )
                   }
                 />
@@ -94,5 +97,5 @@ export function SiteHeader() {
         </Container>
       </nav>
     </header>
-  );
+  )
 }
