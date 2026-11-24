@@ -44,6 +44,33 @@ export function SearchIcon(props: IconProps) {
   )
 }
 
+export function FilterIcon(props: IconProps) {
+  return (
+    <IconBase size={18} {...props}>
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </IconBase>
+  )
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <IconBase size={18} {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </IconBase>
+  )
+}
+
+export function AlertIcon(props: IconProps) {
+  return (
+    <IconBase size={16} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 8v4.5M12 16h.01" />
+    </IconBase>
+  )
+}
+
 export function ArrowIcon(props: IconProps) {
   return (
     <IconBase {...props}>

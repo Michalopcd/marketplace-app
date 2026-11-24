@@ -17,11 +17,16 @@ interface ProductGridProps {
   emptyAction?: ReactNode
   favoriteIds?: ReadonlySet<Listing['id']>
   onToggleFavorite?: (listingId: Listing['id']) => void
+  /** A sidebar takes width from lg (MARKETPLACE filters): 3 columns at lg, 4 from xl. */
+  withSidebar?: boolean
 }
 
 /** Mobile-first, as in Figma Make: 2 columns on phones and tablets, 4 on desktop. */
-const gridClassName =
-  'grid grid-cols-2 gap-x-2.5 gap-y-7 md:gap-x-4 md:gap-y-9 lg:grid-cols-4 lg:gap-x-[18px]'
+const gridBaseClassName =
+  'grid grid-cols-2 gap-x-2.5 gap-y-7 md:gap-x-4 md:gap-y-9 lg:gap-x-[18px]'
+
+const gridColumns = (withSidebar: boolean) =>
+  `${gridBaseClassName} ${withSidebar ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-4'}`
 
 export function ProductGrid(props: ProductGridProps) {
   return (
@@ -46,7 +51,10 @@ function ProductGridContent({
   emptyAction,
   favoriteIds,
   onToggleFavorite,
+  withSidebar = false,
 }: ProductGridProps) {
+  const gridClassName = gridColumns(withSidebar)
+
   if (isLoading) {
     const safeCount = Number.isFinite(skeletonCount)
       ? Math.max(0, Math.floor(skeletonCount))
