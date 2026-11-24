@@ -99,6 +99,30 @@ describe('ProductGrid', () => {
     expect(pressed[0]).toHaveAccessibleName(`Ulubione: ${sample[1].title}`)
   })
 
+  describe('columns', () => {
+    it('uses 2 → 4 columns by default (HOME)', () => {
+      renderGrid({ listings: sample })
+
+      const list = screen.getByRole('list')
+      expect(list).toHaveClass('grid-cols-2', 'lg:grid-cols-4')
+      expect(list).not.toHaveClass('lg:grid-cols-3')
+    })
+
+    it('leaves room for a sidebar: 3 columns at lg, 4 from xl', () => {
+      const { container } = renderGrid({ listings: sample, withSidebar: true })
+
+      expect(screen.getByRole('list')).toHaveClass('grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4')
+      expect(screen.getByRole('list')).not.toHaveClass('lg:grid-cols-4')
+      expect(container.querySelector('ul')).not.toBeNull()
+    })
+
+    it('applies the same columns to the loading skeletons', () => {
+      const { container } = renderGrid({ listings: [], isLoading: true, withSidebar: true })
+
+      expect(container.querySelector('div[aria-hidden="true"].grid')).toHaveClass('lg:grid-cols-3')
+    })
+  })
+
   it.each([
     [3, 3],
     [2.7, 2],

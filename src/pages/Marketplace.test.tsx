@@ -259,4 +259,136 @@ describe('Marketplace', () => {
       expect(within(results()).queryByRole('button')).not.toBeInTheDocument()
     })
   })
+
+  describe('filters (Issue #12)', () => {
+    const sidebar = () => screen.getByRole('complementary', { name: 'Filtry' })
+    const sidebarRadio = (name: string) => within(sidebar()).getByRole('radio', { name })
+    const priceField = (name: 'Cena minimalna' | 'Cena maksymalna') =>
+      within(sidebar()).getByRole('textbox', { name })
+    const sortSelect = () => screen.getByRole('combobox', { name: 'Sortuj' })
+
+    it('reflects a category link from the navigation', () => {
+      renderMarketplace('/marketplace?category=fashion&subcategory=men')
+
+      expect(sidebarRadio('Moda')).toBeChecked()
+      expect(sidebarRadio('Mężczyźni')).toBeChecked()
+    })
+
+    it('filters by category and updates the URL, heading and results', () => {
+      renderMarketplace()
+
+      fireEvent.click(sidebarRadio('Elektronika'))
+
+      const electronics = available.filter((l) => l.category === 'electronics')
+      expect(location()).toBe('/marketplace?category=electronics')
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Elektronika')
+      expect(cards()).toHaveLength(electronics.length)
+    })
+
+    it('combines the condition filter with the search query', () => {
+      renderMarketplace('/marketplace?query=kurtka')
+
+      fireEvent.click(sidebarRadio('Dobry'))
+
+      expect(location()).toBe('/marketplace?query=kurtka&condition=good')
+      expect(searchBox()).toHaveValue('kurtka')
+    })
+
+    it('sorts by price', () => {
+      renderMarketplace()
+
+      fireEvent.change(sortSelect(), { target: { value: 'price-asc' } })
+
+      const prices = available.map((l) => l.price).toSorted((a, b) => a - b)
+      const shown = cards().map((card) => card.textContent ?? '')
+      expect(location()).toBe('/marketplace?sortBy=price-asc')
+      expect(shown[0]).toContain(formatPriceText(prices[0]))
+      expect(shown.at(-1)).toContain(formatPriceText(prices.at(-1) ?? 0))
+    })
+
+    it('filters by a valid price range', () => {
+      renderMarketplace()
+
+      fireEvent.change(priceField('Cena minimalna'), { target: { value: '500' } })
+      fireEvent.blur(priceField('Cena minimalna'))
+
+      expect(location()).toBe('/marketplace?minPrice=500')
+      expect(cards()).toHaveLength(available.filter((l) => l.price >= 500).length)
+    })
+
+    it('rejects an inverted price range without changing the URL or the list', () => {
+      renderMarketplace()
+
+      fireEvent.change(priceField('Cena minimalna'), { target: { value: '300' } })
+      fireEvent.change(priceField('Cena maksymalna'), { target: { value: '100' } })
+      fireEvent.blur(priceField('Cena maksymalna'))
+
+      expect(
+        within(sidebar()).getByText('Cena minimalna nie może być wyższa od maksymalnej.'),
+      ).toBeInTheDocument()
+      expect(location()).toBe('/marketplace')
+      expect(cards()).toHaveLength(available.length)
+      expect(priceField('Cena minimalna')).toHaveValue('300')
+    })
+
+    it('clears filters and sorting but keeps the search query', () => {
+      renderMarketplace('/marketplace?query=kurtka&category=fashion&condition=good&sortBy=price-desc')
+
+      const clear = within(sidebar()).getByRole('button', { name: 'Wyczyść filtry (2)' })
+      clear.focus()
+      fireEvent.click(clear)
+
+      expect(location()).toBe('/marketplace?query=kurtka')
+      expect(searchBox()).toHaveValue('kurtka')
+      expect(sidebarRadio('Wszystkie')).toBeChecked()
+      // Nothing left to clear, yet keyboard focus must not fall back to <body>.
+      expect(clear).toHaveFocus()
+      expect(clear).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('drops price drafts the URL never held when filters are cleared', () => {
+      renderMarketplace('/marketplace?minPrice=50')
+
+      fireEvent.change(priceField('Cena maksymalna'), { target: { value: '10' } })
+      fireEvent.blur(priceField('Cena maksymalna'))
+      fireEvent.click(within(sidebar()).getByRole('button', { name: 'Wyczyść filtry (1)' }))
+
+      expect(priceField('Cena minimalna')).toHaveValue('')
+      expect(priceField('Cena maksymalna')).toHaveValue('')
+      expect(
+        within(sidebar()).queryByText('Cena minimalna nie może być wyższa od maksymalnej.'),
+      ).not.toBeInTheDocument()
+    })
+
+    describe('mobile drawer', () => {
+      const trigger = () => screen.getByRole('button', { name: /^Filtry/ })
+
+      it('shows the active filter count and filters from inside the panel', () => {
+        renderMarketplace('/marketplace?category=home')
+
+        expect(trigger()).toHaveAccessibleName('Filtry, 1 aktywny')
+        fireEvent.click(trigger())
+        const panel = screen.getByRole('dialog', { name: 'Filtry' })
+
+        fireEvent.click(within(panel).getByRole('radio', { name: 'Sport' }))
+
+        const sports = available.filter((l) => l.category === 'sports')
+        expect(location()).toBe('/marketplace?category=sports')
+        fireEvent.click(
+          within(panel).getByRole('button', { name: `Pokaż ${formatOfferCount(sports.length)}` }),
+        )
+        expect(panel).not.toHaveAttribute('open')
+      })
+    })
+  })
 })
+
+/** Matches how `ProductCard` prints a price (non-breaking space before "zł"). */
+function formatPriceText(amount: number) {
+  return new Intl.NumberFormat('pl-PL', {
+    style: 'currency',
+    currency: 'PLN',
+    maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+  }).format(amount)
+}
