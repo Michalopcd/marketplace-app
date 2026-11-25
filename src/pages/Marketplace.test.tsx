@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mockListings } from '../data/mockListings'
 import {
@@ -9,6 +9,7 @@ import {
 } from '../redux/slices/listingsSlice'
 import * as listingsService from '../services/listingsService'
 import { renderWithProviders } from '../test/renderWithProviders'
+import { MARKETPLACE_PAGE_SIZE } from '../utils/constants'
 import { formatOfferCount } from '../utils/formatting'
 import { Marketplace } from './Marketplace'
 
@@ -19,11 +20,23 @@ const loaded: ListingsState = {
 }
 
 const available = mockListings.filter((listing) => !listing.isSold)
+/** Cards visible before "Załaduj więcej" (Issue #13): 20 of the 24 available listings. */
+const FIRST_PAGE = Math.min(available.length, MARKETPLACE_PAGE_SIZE)
 
 /** Shows the current URL so tests can assert what the page writes to it. */
 function LocationProbe() {
   const { pathname, search } = useLocation()
   return <output data-testid="location">{pathname + search}</output>
+}
+
+/** Stands in for the browser's Back button (MemoryRouter has no browser chrome). */
+function BackProbe() {
+  const navigate = useNavigate()
+  return (
+    <button type="button" onClick={() => void navigate(-1)}>
+      test: wstecz
+    </button>
+  )
 }
 
 function renderMarketplace(
@@ -34,6 +47,7 @@ function renderMarketplace(
     <>
       <Marketplace />
       <LocationProbe />
+      <BackProbe />
     </>,
     { route, preloadedState: { listings } },
   )
@@ -76,10 +90,10 @@ describe('Marketplace', () => {
   })
 
   describe('list', () => {
-    it('shows every available listing and the offer count', () => {
+    it('shows the first page of available listings and the total offer count', () => {
       renderMarketplace()
 
-      expect(cards()).toHaveLength(available.length)
+      expect(cards()).toHaveLength(FIRST_PAGE)
       expect(resultCount()).toHaveTextContent(
         formatOfferCount(available.length),
       )
@@ -96,7 +110,7 @@ describe('Marketplace', () => {
     })
 
     it('links every card to its product page', () => {
-      renderMarketplace()
+      renderMarketplace('/marketplace?page=2')
 
       const sortedAvailable = available.toSorted(
         (a, b) =>
@@ -171,7 +185,7 @@ describe('Marketplace', () => {
       )
 
       expect(location()).toBe('/marketplace')
-      expect(cards()).toHaveLength(available.length)
+      expect(cards()).toHaveLength(FIRST_PAGE)
     })
   })
 
@@ -194,7 +208,7 @@ describe('Marketplace', () => {
 
       expect(location()).toBe('/marketplace')
       expect(searchBox()).toHaveValue('')
-      expect(cards()).toHaveLength(available.length)
+      expect(cards()).toHaveLength(FIRST_PAGE)
       // The button unmounts with the empty state; focus must not fall back to <body>.
       expect(searchBox()).toHaveFocus()
     })
@@ -243,7 +257,7 @@ describe('Marketplace', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Spróbuj ponownie' }))
 
-      await waitFor(() => expect(cards()).toHaveLength(available.length))
+      await waitFor(() => expect(cards()).toHaveLength(FIRST_PAGE))
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
@@ -302,8 +316,10 @@ describe('Marketplace', () => {
       const prices = available.map((l) => l.price).toSorted((a, b) => a - b)
       const shown = cards().map((card) => card.textContent ?? '')
       expect(location()).toBe('/marketplace?sortBy=price-asc')
+      // Sorting resets pagination: the 20 cheapest, in ascending order.
+      expect(shown).toHaveLength(FIRST_PAGE)
       expect(shown[0]).toContain(formatPriceText(prices[0]))
-      expect(shown.at(-1)).toContain(formatPriceText(prices.at(-1) ?? 0))
+      expect(shown.at(-1)).toContain(formatPriceText(prices[FIRST_PAGE - 1]))
     })
 
     it('filters by a valid price range', () => {
@@ -327,7 +343,7 @@ describe('Marketplace', () => {
         within(sidebar()).getByText('Cena minimalna nie może być wyższa od maksymalnej.'),
       ).toBeInTheDocument()
       expect(location()).toBe('/marketplace')
-      expect(cards()).toHaveLength(available.length)
+      expect(cards()).toHaveLength(FIRST_PAGE)
       expect(priceField('Cena minimalna')).toHaveValue('300')
     })
 
@@ -379,6 +395,109 @@ describe('Marketplace', () => {
         )
         expect(panel).not.toHaveAttribute('open')
       })
+    })
+  })
+
+  describe('load more (Issue #13)', () => {
+    const loadMoreButton = () => screen.queryByRole('button', { name: 'Załaduj więcej' })
+    const shownStatus = () =>
+      screen.getAllByRole('status').find((el) => el.textContent?.startsWith('Wyświetlono'))
+
+    it('shows the first 20 offers with a count and a "load more" button', () => {
+      renderMarketplace()
+
+      expect(cards()).toHaveLength(FIRST_PAGE)
+      expect(shownStatus()).toHaveTextContent(`Wyświetlono ${FIRST_PAGE} z ${available.length} ofert`)
+      expect(loadMoreButton()).toBeInTheDocument()
+    })
+
+    it('loads the next page into the URL and moves focus to the first new card', () => {
+      renderMarketplace('/marketplace?sortBy=price-asc')
+
+      fireEvent.click(loadMoreButton()!)
+
+      expect(location()).toBe('/marketplace?sortBy=price-asc&page=2')
+      expect(cards()).toHaveLength(available.length)
+      expect(shownStatus()).toHaveTextContent(
+        `Wyświetlono ${available.length} z ${available.length} ofert`,
+      )
+      // The button disappears at the end – focus must land on the content, not on <body>.
+      expect(loadMoreButton()).not.toBeInTheDocument()
+      expect(within(cards()[FIRST_PAGE]).getByRole('link')).toHaveFocus()
+    })
+
+    it('restores the loaded pages from a shared link', () => {
+      renderMarketplace('/marketplace?page=2')
+
+      expect(cards()).toHaveLength(available.length)
+      expect(loadMoreButton()).not.toBeInTheDocument()
+    })
+
+    it('goes back to the first page with the browser Back button', () => {
+      renderMarketplace()
+
+      fireEvent.click(loadMoreButton()!)
+      fireEvent.click(screen.getByRole('button', { name: 'test: wstecz' }))
+
+      expect(location()).toBe('/marketplace')
+      expect(cards()).toHaveLength(FIRST_PAGE)
+    })
+
+    describe('starts again from the first page', () => {
+      // Every case starts with all 24 cards loaded, so a reset is visible as 24 → ≤ 20.
+      const startLoaded = () => {
+        renderMarketplace('/marketplace?page=2')
+        expect(cards()).toHaveLength(available.length)
+      }
+
+      it('when the sort order changes', () => {
+        startLoaded()
+
+        fireEvent.change(screen.getByRole('combobox', { name: 'Sortuj' }), {
+          target: { value: 'price-desc' },
+        })
+
+        expect(location()).toBe('/marketplace?sortBy=price-desc')
+        expect(cards()).toHaveLength(FIRST_PAGE)
+      })
+
+      it('when the search query changes', () => {
+        startLoaded()
+
+        search('a')
+
+        const hits = available.filter((l) => l.title.toLocaleLowerCase('pl-PL').includes('a'))
+        expect(location()).toBe('/marketplace?query=a')
+        expect(cards()).toHaveLength(Math.min(hits.length, MARKETPLACE_PAGE_SIZE))
+      })
+
+      it('when a filter changes', () => {
+        startLoaded()
+
+        fireEvent.click(
+          within(screen.getByRole('complementary', { name: 'Filtry' })).getByRole('radio', {
+            name: 'Moda',
+          }),
+        )
+
+        const fashion = available.filter((l) => l.category === 'fashion')
+        expect(location()).toBe('/marketplace?category=fashion')
+        expect(cards()).toHaveLength(Math.min(fashion.length, MARKETPLACE_PAGE_SIZE))
+      })
+    })
+
+    it('has no pagination footer when the results fit on one page', () => {
+      renderMarketplace('/marketplace?category=electronics')
+
+      expect(loadMoreButton()).not.toBeInTheDocument()
+      expect(shownStatus()).toBeUndefined()
+    })
+
+    it('has no pagination footer while loading', () => {
+      vi.spyOn(listingsService, 'getListings').mockReturnValue(new Promise(() => {}))
+      renderMarketplace('/marketplace', initialListingsState)
+
+      expect(loadMoreButton()).not.toBeInTheDocument()
     })
   })
 })
