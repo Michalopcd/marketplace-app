@@ -11,6 +11,11 @@ export const MARKETPLACE = {
   resetAction: 'Wyczyść wyszukiwanie i filtry',
 } as const
 
+/** "Załaduj więcej" footer copy (Issue #13 mockup). */
+export const LOAD_MORE = {
+  action: 'Załaduj więcej',
+} as const
+
 /** Tailwind `lg`: from here the filters live in the sidebar instead of the drawer. */
 export const LG_QUERY = '(min-width: 64rem)'
 

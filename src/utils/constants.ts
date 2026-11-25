@@ -48,5 +48,9 @@ export const SORT_LABELS = {
   'price-desc': 'Cena: od najwyższej',
 } as const satisfies Record<(typeof SORT_OPTIONS)[number], string>
 
+/** Listings per "Załaduj więcej" step (Issue #13); matches Firestore `limit(20)` planned for Sprint 5. */
+export const MARKETPLACE_PAGE_SIZE = 20
+
 /** Search phrases longer than a listing title (max 100 chars) can't match anything. */
 export const MAX_SEARCH_QUERY_LENGTH = 100
+
